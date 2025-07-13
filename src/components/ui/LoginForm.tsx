@@ -7,12 +7,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const router = useRouter()
+    const { login } = useAuth()
+
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault()
+        setError("")
+    
+        if (email === "staff@clinic.com" && password === "123456") {
+          login()
+          router.push("/") // Redirect to the main page (calendar view)
+        } else {
+          setError("Invalid email or password.")
+        }
+      }
 
     
   return (
@@ -23,7 +38,7 @@ export default function LoginForm() {
         <CardDescription>Enter your credentials to access the appointment calendar.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form  className="space-y-4">
+        <form  onSubmit={handleLogin}  className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
