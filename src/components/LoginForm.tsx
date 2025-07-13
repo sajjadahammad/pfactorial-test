@@ -2,7 +2,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -13,7 +12,6 @@ export default function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
-    const router = useRouter()
     const { login } = useAuth()
 
 
@@ -23,7 +21,6 @@ export default function LoginForm() {
     
         if (email === "staff@clinic.com" && password === "123456") {
           login()
-          router.push("/") // Redirect to the main page (calendar view)
         } else {
           setError("Invalid email or password.")
         }
@@ -66,6 +63,17 @@ export default function LoginForm() {
             Login
           </Button>
         </form>
+        
+        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={() => {
+          setEmail("staff@clinic.com")
+          setPassword("123456")
+          setError("")
+        }}>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Demo Credentials:</p>
+          <p className="text-sm font-mono">Email: staff@clinic.com</p>
+          <p className="text-sm font-mono">Password: 123456</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Click to auto-fill</p>
+        </div>
       </CardContent>
     </Card>
   </div>
