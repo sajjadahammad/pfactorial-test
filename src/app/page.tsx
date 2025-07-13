@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/use-auth"
 import LoginForm from "@/components/LoginForm"
-import CalendarView from "@/components/CalendarView"
+import { CalendarView } from "@/components/CalendarView"
 import { Button } from "@/components/ui/button"
 
 export default function Home() {

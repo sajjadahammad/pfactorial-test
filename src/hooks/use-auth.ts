@@ -15,6 +15,7 @@ export function useAuth() {
   const login = () => {
     localStorage.setItem("isLoggedIn", "true")
     setIsLoggedIn(true)
+    window.location.reload()
   }
 
   const logout = () => {
