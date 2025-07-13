@@ -24,6 +24,7 @@ import { formatDateToYYYYMMDD, cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function CalendarView() {
   const { appointments, addAppointment, updateAppointment, deleteAppointment, getAppointmentsForDate } =
@@ -35,6 +36,9 @@ export function CalendarView() {
   const [selectedDayForForm, setSelectedDayForForm] = useState<string>(formatDateToYYYYMMDD(new Date()))
 
   const isMobile = useIsMobile()
+
+  const [filterPatientId, setFilterPatientId] = useState<string | null>("") // Updated default value
+  const [filterDoctorId, setFilterDoctorId] = useState<string | null>("") // Updated default value
 
   const daysInMonth = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth))
@@ -74,6 +78,40 @@ export function CalendarView() {
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <h2 className="text-xl font-semibold">{format(currentMonth, "MMMM yyyy")}</h2>
+        <div className="flex items-center gap-2">
+          <Select
+            value={filterPatientId === null ? "all" : filterPatientId}
+            onValueChange={(value) => setFilterPatientId(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by Patient" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Patients</SelectItem>
+              {patients.map((patient) => (
+                <SelectItem key={patient.id} value={patient.id}>
+                  {patient.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterDoctorId === null ? "all" : filterDoctorId}
+            onValueChange={(value) => setFilterDoctorId(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by Doctor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Doctors</SelectItem>
+              {doctors.map((doctor) => (
+                <SelectItem key={doctor.id} value={doctor.id}>
+                  {doctor.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
           <ChevronRight className="h-5 w-5" />
         </Button>
@@ -87,7 +125,12 @@ export function CalendarView() {
       </div>
       <div className="grid grid-cols-7 flex-grow">
         {daysInMonth.map((day, index) => {
-          const dayAppointments = getAppointmentsForDate(formatDateToYYYYMMDD(day))
+          const allDayAppointments = getAppointmentsForDate(formatDateToYYYYMMDD(day))
+          const dayAppointments = allDayAppointments.filter((appt) => {
+            const matchesPatient = filterPatientId ? appt.patientId === filterPatientId : true
+            const matchesDoctor = filterDoctorId ? appt.doctorId === filterDoctorId : true
+            return matchesPatient && matchesDoctor
+          })
           const isCurrentMonth = isSameMonth(day, currentMonth)
           const isToday = isSameDay(day, new Date())
 
@@ -176,9 +219,48 @@ export function CalendarView() {
             <Plus className="h-4 w-4 mr-2" /> Add
           </Button>
         </div>
+        <div className="flex flex-col sm:flex-row items-center gap-2 p-4 border-b">
+          <Select
+            value={filterPatientId === null ? "all" : filterPatientId}
+            onValueChange={(value) => setFilterPatientId(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Filter by Patient" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Patients</SelectItem>
+              {patients.map((patient) => (
+                <SelectItem key={patient.id} value={patient.id}>
+                  {patient.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterDoctorId === null ? "all" : filterDoctorId}
+            onValueChange={(value) => setFilterDoctorId(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Filter by Doctor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Doctors</SelectItem>
+              {doctors.map((doctor) => (
+                <SelectItem key={doctor.id} value={doctor.id}>
+                  {doctor.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
           {daysToShow.map((day, index) => {
-            const dayAppointments = getAppointmentsForDate(formatDateToYYYYMMDD(day))
+            const allDayAppointments = getAppointmentsForDate(formatDateToYYYYMMDD(day))
+            const dayAppointments = allDayAppointments.filter((appt) => {
+              const matchesPatient = filterPatientId ? appt.patientId === filterPatientId : true
+              const matchesDoctor = filterDoctorId ? appt.doctorId === filterDoctorId : true
+              return matchesPatient && matchesDoctor
+            })
             const isToday = isSameDay(day, new Date())
 
             return (
